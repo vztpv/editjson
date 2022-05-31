@@ -1,6 +1,33 @@
 # editjson
 ```py3
 
+# editjson
+# 2022-05-31
+# check key no ends %$~ in json data.
+
+# schema
+schema = {
+    "name%$name" 
+    "power" {
+        "army%$" 
+    }
+} 
+
+# script
+script = {
+    $name == "AAA" # all comparison is cond.
+    $ = $ * 2      # to update...
+} 
+
+# input
+{
+    "json_data" : { "name" : "AAA",  "power" : { "army" : 20 } }  
+}
+# result
+{
+    "json_data" : { "name" : "AAA",  "power" : { "army" : 40 } }  
+}
+
 # 2022-05-27
 
 # goal : To edit json-like? data fastly and simplely, using thread.
