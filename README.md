@@ -7,11 +7,11 @@
 
 # schema
 schema = { 
-    "name" %str$name  
+    "name" %str $name  
     "power" {
-        "army" %int$ 
+        "army" %int $ 
     }
-    # "power" [ %int %int %int %int$ ]
+    # "power" [ %int %int %int %int $ ]
 } 
 
 # 2022-05-31
