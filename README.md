@@ -2,6 +2,18 @@
 ```py3
 
 # editjson
+
+# 2022-06-02
+
+# schema
+schema = {
+    "name" % $name 
+    "power" {
+        "army" % $ 
+    }
+} 
+
+
 # 2022-05-31
 # check key no ends %$~ in json data.
 
