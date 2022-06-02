@@ -6,13 +6,13 @@
 # 2022-06-02
 
 # schema
-schema = {
-    "name" % $name 
+schema = { 
+    "name" %str$name  
     "power" {
-        "army" % $ 
+        "army" %int$ 
     }
+    # "power" [ %int %int %int %int$ ]
 } 
-
 
 # 2022-05-31
 # check key no ends %$~ in json data.
