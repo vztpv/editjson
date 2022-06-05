@@ -9,7 +9,7 @@
 make_map = {
     name = test_map
     
-    where = [ $root {} [] "provinces" ]
+    where = [ $root [] {} "provinces" ]
     
     child_json = {
         "owner" %str%key $owner
