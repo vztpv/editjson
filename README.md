@@ -6,7 +6,7 @@
 # 2022-06-05
 
 # make (multi-)set, (multi-)map, ...
-make_map = {
+make_map = { # using parallel stable sort? + binary search...
     name = test_map
     
     where = [ $root [] {} "provinces" ]
