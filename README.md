@@ -3,6 +3,29 @@
 
 # editjson
 
+# 2022-06-05
+
+# make (multi-)set, (multi-)map, ...
+make_map = {
+    name = test_map
+    
+    where = [ $root {} [] "provinces" ]
+    
+    child_json = {
+        "owner" %str%key $owner
+        "pop" %int%data $pop
+    }
+}
+
+# script
+script = {
+    if $name == "AAA" { 
+        $ = $ * 2      # to update...
+    }
+    
+    let arr[] = test_map[$name].$pop
+} 
+
 # 2022-06-02
 
 # schema
