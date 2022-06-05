@@ -11,7 +11,7 @@ make_map = { # using parallel stable sort? + binary search...
     
     where = [ $root [] {} "provinces" ]
     
-    child_json = {
+    json = {
         "owner" %str%key $owner
         "pop" %int%data $pop
     }
