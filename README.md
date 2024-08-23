@@ -2,6 +2,137 @@
 ```py3
 
 # editjson
+# 2024-08-24
+# json example.
+[ 
+    {
+        "countries" : [
+            {
+                "name" : "AAA",
+                "power" : {
+                    "army" : 100,
+                    "air" : 100,
+                    "navy" : 100
+                }
+            },
+            {
+                "name" : "BBB",
+                "power" : {
+                    "army" : 50,
+                    "air" : 50,
+                    "navy" : 50
+                }
+            },
+            ...
+        ],
+        "provinces" : {
+            "-1" : { # chk get "-1" ? cf) ~ : [ { "id" = "-1",  "owner" : "AAA", ...
+                "owner" : "AAA",
+                "trade_power"  : 10
+            },
+            "-2" : {
+                "owner" : "BBB",
+                "trade_power"  : 10
+            },
+            "-3" : {
+                "owner" : "AAA",
+                "trade_power"  : 50
+            },
+            ...
+        }
+    }
+]
+# 0. json-path?
+$root
+$root.[].{}."countries"
+# 1. chk my? json-schema?
+schema = {
+    "name" : "$name%string", # condition.
+    "power" : {
+        "army" : "$%integer" 
+    }
+}
+# 2. script.
+script = {
+    if $name == "AAA" { 
+        let x <- $ * 2
+        $ <- x + 1      # to update...
+    }
+}   
+# 3. work
+work = {
+    name = test
+    parameter = [ ]
+    schema = {
+        "name" : "$name%string", 
+        "power" : {
+            "army" : "$%integer" # case no need air, no need navy.
+        }
+    }    
+    script = {
+        if $name == "AAA" { # all comparison is cond.
+            $ <- $ * 2 + 1  # to update...
+        }   
+    }
+}
+# 4. shell? 
+load('citylots.json', 0); # (0 - use most cpu`s core?)
+cd('json-path'); # json-path <- $root.[].{}."countries"
+while $NOW != EOA /* END OF ARRAY */ {
+    work('test', $NOW);
+    $NOW = next($NOW);
+}
+# 5. make (multi-)set?, (multi-)map.
+let test_map = make_multi_map($root.[].{}."provinces".$all, "owner", "trade_power");
+                    #            route,                key      data
+work('test2', $NOW, test_map); # before called cd(~~);
+
+# test2`s script?
+script = {
+    let trade_power[] = %parameter.test_map[$name].second;
+    if any trade_power > 30 { # any, all, not?, atleast(5/*number*/)?
+        $army = $army + 10;
+    }
+}
+# all type is pointer? 
+# log...(print())
+# revisit-work
+work = {
+    name = test1
+    parameter = [ ]
+    run = {
+        schema = { ~~ }
+        script = { ~~ }
+    }
+    run = {
+        schema = { ~~ }
+        script = { ~~ }
+    }
+}
+work = {
+    name = test2
+    parameter = [ test_map ]
+    run = {
+        schema = { ~~ }
+        script = { ~~ }
+    }
+    run = {
+        schema = { ~~ }
+        script = { ~~ }
+    }
+}
+# parallel? 
+cd(~~);
+let x = make_thread('test1', $NOW);
+cd(~~);
+let y = make_thread('test2', $NOW);
+wait(x);
+wait(y);
+# default variable - const, only can change in work.run.script ?
+# schema - not existing key?
+schema = {
+    "new_key" : $new_element%NONE # not existing key (or value?).
+}
 
 # 2022-06-05
 
