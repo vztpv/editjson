@@ -89,7 +89,7 @@ work('test2', $NOW, test_map); # before called cd(~~);
 
 # test2`s script?
 script = {
-    let trade_power[] = %parameter.test_map[$name].second;
+    let trade_power[] = %parameter.test_map[$name];
     if any trade_power > 30 { # any, all, not?, atleast(5/*number*/)?
         $army = $army + 10;
     }
