@@ -131,7 +131,7 @@ wait(y);
 # default variable - const, only can change in work.run.script ?
 # schema - not existing key?
 schema = {
-    "new_key" : $new_element%NONE # not existing key (or value?).
+    "new_key" : "$new_element%NONE" # not existing key (or value?).
 }
 
 # 2022-06-05
