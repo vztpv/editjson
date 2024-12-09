@@ -2,7 +2,7 @@
 ```py3
 
 # editjson
-# 2024-08-24
+
 # json example.
 [ 
     {
@@ -42,6 +42,97 @@
         }
     }
 ]
+
+# 2024-12-10
+./clau_edit ex1.json 0
+# loaded file : "ex1.json"
+# ls?, cd?, help?, with utf-8
+#----------------------------------
+cd []
+cd {}
+cd "countries"
+# 
+schema 
+{
+    "name" : %string,
+    "power" : { 
+        "army" : %$%int
+       # , "nuke" : %CAN_BE_REMOVED # ?
+    }
+    #, "economy" : %NONE%int # NONE <- to insert? # %OPTIONAL ?
+}
+schema_end ex_schema # 
+#
+script
+{
+    if $name == "AAA" {
+        $ = $ * 2 + 1; 
+    }   
+}
+script_end ex_script
+#
+run 
+{
+    %now = 0;
+    while not END_OF_ARRAY 
+    {
+        ex_script(ex_schema);
+        next;
+    }
+}
+#
+schema # view?
+{
+    "owner" : %multi_key%string,
+    "trade_power" : %int
+}
+schema_end  new_schema
+#
+script # 
+{
+    builtin_insert_to_multi_map(%parameter.1, $owner, $trade_power);
+}
+script_end  insert_multi_map_owner_trade_power
+#
+cd $root.[].{}."provinces"
+#
+global{} test_map
+#
+run
+{
+    %now = 0;
+    while not END_OF_ARRAY
+    {
+        insert_multi_map_owner_trade_power(new_schema, test_map);
+        next
+    }
+}
+#
+script
+{
+    let[] trade_power = %parameter.1[$name];
+    if any trade_power > 30 { # any, all, not?, at_least(5/*number*/)?
+        $ = $ + 10;
+    }
+}
+script_end test
+#
+cd ..
+cd "countries"
+#
+run 
+{
+    %now = 0;
+    while not END_OF_ARRAY
+    { 
+        test(ex_schema, test_map); # before called cd(~~);
+        next;
+    }
+}
+#
+
+
+# 2024-08-24
 # 0. json-path?
 $root
 $root.[].{}."countries"
