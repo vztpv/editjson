@@ -57,8 +57,8 @@ schema
     "name" : %string,
     # cf) "power" : { "army" : %$%int, "nuke" : %CAN_BE_REMOVED } 
     "power"."army" : %$%int,
-    "power"."nuke" : %CAN_BE_REMOVED,
-    "economy" : %NONE%int
+    "power"."nuke" : %CAN_BE_REMOVED
+    #, "economy" : %NONE%int # to Insert ?
 }
 
 schema_end ex_schema # 
