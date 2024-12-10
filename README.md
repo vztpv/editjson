@@ -55,12 +55,12 @@ cd "countries"
 schema 
 {
     "name" : %string,
-    "power" : { 
-        "army" : %$%int
-       # , "nuke" : %CAN_BE_REMOVED # ?
-    }
-    #, "economy" : %NONE%int # NONE <- to insert? # %OPTIONAL ?
+    # cf) "power" : { "army" : %$%int, "nuke" : %CAN_BE_REMOVED } 
+    "power"."army" : %$%int,
+    "power"."nuke" : %CAN_BE_REMOVED,
+    "economy" : %NONE%int
 }
+
 schema_end ex_schema # 
 #
 script
@@ -101,7 +101,7 @@ global{} test_map
 run
 {
     %now = 0;
-    while not END_OF_ARRAY
+    while not END_OF_OBJECT
     {
         insert_multi_map_owner_trade_power(new_schema, test_map);
         next
