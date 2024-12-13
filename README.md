@@ -43,6 +43,107 @@
     }
 ]
 
+# 2024-12-14
+
+# clau_edit? program to edit json.
+# .pattern, .action, .where, .global
+
+.pattern {
+    "name" : %string,
+    "power" : {
+        "army" : %$%int,
+        "nuke" : %CAN_BE_REMOVED
+    }
+} pattern1;
+
+.action {
+    if ( $name == "AAA" ) {
+        $ = $ * 2 + 1 ;
+    }
+} action1;
+
+.where {
+    %root.[].{}.["countries"].{%all} # check...
+} where1;
+
+# can access from .action?
+.global {
+	[ ] array;  # ? add(array, $);
+	{ } object; # ? add(object, "key", value);
+	{ } object2; # temp?
+}
+
+.run {
+    pattern1 { action1 } in where1;
+} 
+
+# if object is multi-map? or claujson::Object?
+# any, not, all, at_least, at_most, exactly?
+.action {
+	if any( .object["name"] > 50 ) {
+		#
+	}
+	if all( .object["name"] > 20 ) {
+		#
+	}
+}
+
+## in .where?
+.pattern {
+	"name" : %$name
+} p;
+.where {
+	.pattern {
+		"owner" : %$owner
+	} _;
+	.action {
+		return $owner[] += $owner;
+	} __;
+	.where {
+		%root.[].{}.{"provinces"}.{$all}
+	} ___;
+	.run {
+		_ { __ } in ___; 
+	}
+	%root.[].{}.["countries"].{ $name in $owner }
+} w;
+.action {
+	print($name, "\n");
+} a;
+.run {
+	p { a } in w;
+}
+
+## in .pattern
+.pattern {
+	"owner" : $owner
+} pat1;
+.action {
+	object[$owner] += %NOW_KEY ;
+} act1;
+.where {
+	%root.[].{}.{"provinces"}.{$all}
+} whe1;
+.pattern {
+	"name" : %$name
+} pat2;
+.action {
+	print($name, object[$name], "\n");
+} act2;
+.where {
+	%root.[].{}.["countries"].{$all}
+} whe2;
+.run {
+	pat1 { act1 } in whe1;
+	pat2 { act2 } in whe2;
+}
+
+## in .action ##
+# %NOW_IDX # NOW <- from .where?
+# %NOW_KEY
+# %ROUTE # chk.. %all 
+
+
 # 2024-12-13
 
 # clau_edit? program to edit json.
