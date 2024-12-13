@@ -43,6 +43,40 @@
     }
 ]
 
+# 2024-12-13
+
+# clau_edit? program to edit json.
+# .pattern, .action, .where, .global
+
+.pattern {
+    "name" : %string,
+    "power" : {
+        "army" : %$%int,
+        "nuke" : %CAN_BE_REMOVED
+    }
+} pattern1
+
+.action {
+    if $name == "AAA" {
+        $ = $ * 2 + 1 ;
+    }
+} action1
+
+.where {
+    %root.[].{}.["countries"].{$all} # check...
+} where1
+
+# can access from .action?
+.global {
+	[ ] array # ?
+	{ } object # ?
+}
+
+.run {
+    pattern1 { action1 } in where1
+} 
+
+
 # 2024-12-10
 ./clau_edit ex1.json 0
 # loaded file : "ex1.json"
