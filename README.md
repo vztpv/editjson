@@ -45,6 +45,7 @@
 
 # 2024-12-13
 
+
 # clau_edit? program to edit json.
 # .pattern, .action, .where, .global
 
@@ -75,6 +76,17 @@
 .run {
     pattern1 { action1 } in where1
 } 
+
+# if object is multi-map?
+# any, not_, all, at_least, exactly?
+.action {
+	if any( .object["name"] > 50 ) {
+		#
+	}
+	if all( .object["name"] > 20 ) {
+		#
+	}
+}
 
 
 # 2024-12-10
