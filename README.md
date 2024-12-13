@@ -78,7 +78,7 @@
 } 
 
 # if object is multi-map?
-# any, not_, all, at_least, exactly?
+# any, not, all, at_least, at_most exactly?
 .action {
 	if any( .object["name"] > 50 ) {
 		#
