@@ -45,7 +45,6 @@
 
 # 2024-12-13
 
-
 # clau_edit? program to edit json.
 # .pattern, .action, .where, .global
 
@@ -64,13 +63,13 @@
 } action1
 
 .where {
-    %root.[].{}.["countries"].{$all} # check...
+    %root.[].{}.["countries"].{%all} # check...
 } where1
 
 # can access from .action?
 .global {
-	[ ] array # ?
-	{ } object # ?
+	[ ] array  # ? array += $;
+	{ } object # ? object += { "key" : value };
 }
 
 .run {
@@ -78,7 +77,7 @@
 } 
 
 # if object is multi-map?
-# any, not, all, at_least, at_most exactly?
+# any, not, all, at_least, at_most, exactly?
 .action {
 	if any( .object["name"] > 50 ) {
 		#
@@ -87,6 +86,12 @@
 		#
 	}
 }
+
+## in .action ##
+# %NOW_IDX # NOW <- from .where?
+# %NOW_KEY
+# %ROUTE # chk.. %all 
+#
 
 
 # 2024-12-10
