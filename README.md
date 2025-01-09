@@ -43,6 +43,64 @@
     }
 ]
 
+# 2025-01-10
+#scj3 - x64 only.
+# todo - 주석처리! 
+# clau_edit? program to edit json.
+# .pattern, .action, .where, .global
+# strict ? 
+
+.pattern {
+    "name" : %string
+    "power" : {
+        "army" : %$%int
+        "nuke" : %remove_target
+    }
+} pattern1
+
+.action {
+    if $name == "AAA" {
+        $ = $ * 2 + 1
+    }
+} action1
+
+.where {
+    %root.[].{"countries"}.[%all] # check...
+	%global.path 
+} where1
+
+# can access from .action?
+.global {
+	Int i
+	UInt u
+	Float f
+	String s
+	Bool b
+	Array array  # ? add(array, $);
+	Object object # ? add(object, "key", value);
+	Path path
+}
+
+.run {
+    pattern1 { action1 } in where1
+} 
+
+.pattern {
+	"x" : %int
+	"y" : %int
+	"z" : %change_target # insert_target
+} f_patt
+.action {
+	$z = $x + $y 
+} f
+
+.action {
+	let obj = { "x" : 5 "y" : 6 "z" : 0 }
+	f(f_patt, obj)
+	print(obj.{"z"})
+}
+
+
 # 2024-12-14
 
 # clau_edit? program to edit json.
