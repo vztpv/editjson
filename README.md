@@ -43,6 +43,70 @@
     }
 ]
 
+# 2025-01-15
+.pattern {
+	"name" : %string
+	"power" : {
+		"army" : %int
+	}	
+} Pat 
+
+.action {
+	Pat p1 = { 
+		"name" : "AAA"
+		"power" : { 
+			"army" : 10
+			"air" : 20 
+			"navy" : 20 
+		}
+	}
+	Pat p2 = {
+		"name" : "BBB"
+		"power" : {
+			"army" : 20
+		}
+	}
+	.println(p1)
+	.println(p2)
+
+	.goto(%root.0."countries")
+	while NOT %now.IsEndOfContainer() {
+		.enter()
+		Pat ref x = %now # Pat& x = %now
+		if x.name == "AAA" {
+			x.army = 100
+		}
+		.quit()
+		.next()
+	}
+	
+} main
+
+.action {
+	if $name == "AAA" {
+		$army = 100
+	}
+} f
+
+#.goto .iterate <- 내장함수?
+.action {
+	.iterate(pat, f)
+	.goto("countries")
+	.goto(%back) # cd .. ?
+	#.goto(%root.0."countries"})
+} main 
+
+# pattern action matching?
+
+# test.clau
+.action {
+	.print("hello clau")
+	.write("output.json") # copy input file. no change
+} main # std::unordered_map<std::string, Action*> action_map;
+# clau test.clau "input.json"
+# 1. parse json file
+# 2. run aciton those name is main
+
 # 2025-01-10
 #scj3 - x64 only.
 # todo - 주석처리! 
