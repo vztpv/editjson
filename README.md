@@ -43,6 +43,70 @@
     }
 ]
 
+# 2025-01-20
+.pattern {
+	"name" : %string
+	"power" : {
+		"army" : %int
+	}	
+} Pat 
+
+.func {
+	Pat p1 = { 
+		"name" : "AAA"
+		"power" : { 
+			"army" : 10
+			"air" : 20 
+			"navy" : 20 
+		}
+	}
+	Pat p2 = {
+		"name" : "BBB"
+		"power" : {
+			"army" : 20
+		}
+	}
+	.println(p1)
+	.println(p2)
+
+	.goto(%root.0."countries")
+    
+    #.iterate(Pat, f) # iterate with action?
+	while NOT .IsEndOfContainer(%now) {
+		.enter()
+        
+		Pat ref x = %now # Pat& x = %now
+
+        # f(x)
+        {
+            if x.name == "AAA" {
+                x.army = 100
+            }
+        }
+	
+        .quit()
+		.next()
+	}
+} main
+
+.action {
+	if $name == "AAA" {
+		$army = 100
+	}
+} f
+
+# copy input file into output.json
+# clau.exe test.clau input.json
+.func {
+	.println("#hello clau#")
+	.write("output.json") 
+} main
+
+# input : json?, output : json?
+.func {
+    return $ * 2 + 1
+}
+
 # 2025-01-15
 .pattern {
 	"name" : %string
