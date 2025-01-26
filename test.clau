@@ -1,0 +1,109 @@
+# 2025-01-26
+.pattern {
+	"name" : %string
+	"power" : { 
+		"army" : %int
+	} 
+} Pat 
+
+.func {
+	Pat p1 = { 
+		"name" : "AAA"
+		"power" : { 
+			"army" : 10
+			"air" : 20 
+			"navy" : 20 
+		}
+	}
+	Pat p2 = {
+		"name" : "BBB"
+		"power" : {
+			"army" : 20
+		}
+	}
+	.println(p1)
+	.println(p2)
+
+	.goto(%root.0."countries")
+    
+    #.iterate(Pat, f) # iterate with function?
+	while NOT .IsEndOfContainer(%now) {
+		.enter()
+        
+		Pat ref x = %now # Pat& x = %now
+
+        # f(x)
+        {
+            if x.name == "AAA" {
+                x.army = 100
+            }
+        }
+	
+        .quit()
+		.next()
+	}
+} main
+
+# copy input file into output.json
+# clau.exe test.clau input.json
+.func {
+	.println("#hello clau#")
+	.write("output.json") 
+} main
+
+# input : json?, output : json?
+.func {
+    return $ * 2 + 1
+} g
+
+
+ # f(x)
+{
+    if x.name == "AAA" {
+        x.army = 50 + p1.army + p2.army
+    }
+}
+
+# 
+# comma - scanning... tokentype?
+
+# int state = strict_mode? - type check? debug_mode?
+# x.name -> x and name ?  union?
+
+# %root, %now, checking dot? std::vector<claujson::_Value> ?
+
+# NOT,
+
+# .IsEndOfContainer -builtin function?
+
+# .iterate
+
+# global variable?
+# array, object variable?
+
+.pattern %array%mutable arr
+.func {
+    .init_set(arr)
+    .push_set(arr, 0)
+    .pop_set(arr)
+    .to_set(arr)
+    .empty_array(arr)
+    .access_array(arr, idx)
+    .insert_array(arr, idx, 0)
+    .push_back_array(arr, 0)
+    .pop_back_array(arr)
+    .pop_front_array(arr)
+    .size_array(arr)
+    .push_front_array(arr, 0)
+} h
+.pattern %object%mutable obj  # global variable...
+.func {
+    .init_map(obj)
+    .push_map(obj, "key", 123)
+    .pop_map(obj, "key")
+    .to_map(obj)
+    .empty_object(obj)
+    .size_object(obj)
+    .access_object(obj, "key")
+} func_name
+
