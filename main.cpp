@@ -277,6 +277,7 @@ public:
 		Modular, // mod
 
 		Assignment = '=',
+		Comma = ',',
 		Add = '+', Subtract = '-',
 		Multiply = '*', Divide = '/', // Modulo,
 
@@ -297,12 +298,12 @@ public:
 		ScanType type = ScanType::NONE;
 		uint64_t line = 0;
 		claujson::_Value json_data;
-		Pattern pattern_data;
+		std::vector<Pattern> pattern_data;
 	};
 	
 public:
 	Scanner(char* str, uint64_t sz) : buf(str), sz(sz), tokenizer(str, sz) {
-		//
+		tokenizer.init();
 	}
 private:
 	ScanData nextData;
@@ -316,6 +317,8 @@ public:
 		if (x.length == 0) {
 			return token;
 		}
+
+		token.line = x.line;
 
 		if (x.length == 1) {
 			switch (buf[x.start]) {
@@ -361,6 +364,7 @@ public:
 					throw "not valid token : &";
 				}
 				break;
+			case ',':
 			case '+':
 			case '-':
 			case '*':
@@ -376,6 +380,7 @@ public:
 				break;
 			default:
 				token.type = ScanType::Identifier;
+				token.json_data = claujson::_Value(std::string_view(buf + x.start, x.length));
 				break;
 			}
 
@@ -423,6 +428,7 @@ public:
 				if (!claujson::convert_string(claujson::StringView(buf + x.start, x.length), data)) {
 					throw "convert string in json? fail"; // unicode? /uXXXX ?
 				}
+				token.type = ScanType::JSON_VALUE;
 				token.json_data = std::move(data); pass = true;
 				break;
 			}
@@ -436,30 +442,48 @@ public:
 				if (!claujson::convert_number(claujson::StringView(buf + x.start, x.length), number)) {
 					throw "convert number in json? fail"; //
 				}
+				token.type = ScanType::JSON_VALUE;
 				token.json_data = std::move(number); pass = true;
 				break;
 			}
 			break;
 
-			// check true
-			// check false
-			// check null
+			// check true v
+			// check false v
+			// check null v
 			// check ref
+			// check return
 			// check if, else
 			// check while break continue
-			// check return
+			
 			// check Option <- %int %float %uint %string %bool? %true %false %null 
 			//				<- %any 
 			case 't':
-				
-				pass = true;
+				if (4 == x.length && strncmp(buf + x.start, "true", 4) ==0) {
+					token.type = ScanType::JSON_VALUE;
+					token.json_data = claujson::_Value(true);
+					pass = true;	
+				}
 				break;
-
+			case 'f':
+				if (5 == x.length && strncmp(buf + x.start, "false", 5) ==0) {
+					token.type = ScanType::JSON_VALUE;
+					token.json_data = claujson::_Value(false);
+					pass = true;	
+				}
+				break;
+			case 'n':
+				if (4 == x.length && strncmp(buf + x.start, "null", 4) ==0) {
+					token.type = ScanType::JSON_VALUE;
+					token.json_data = claujson::_Value(nullptr);
+					pass = true;	
+				}
 				break;
 			}
 
 			if (!pass) {
 				token.type = ScanType::Identifier;
+				token.json_data = claujson::_Value(std::string_view(buf + x.start, x.length));
 			}
 		}
 
