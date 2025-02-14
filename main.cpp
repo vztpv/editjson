@@ -41,7 +41,7 @@ public:
 		// 
 		table['\0'] = 1;
 		for (int i = 0; i < 128; ++i) {
-			table[i] = is_space(i)? 1 : 0;
+			table[i] = is_space(i) ? 1 : 0;
 		}
 		table['('] = 2;
 		table[')'] = 2;
@@ -194,12 +194,13 @@ class BinaryOperator : public Expression {
 public:
 
 public:
-	
+
 };
 
+// input : json, output : json?
 class Func : public Statement {
 public:
-	Expression* input;
+	Expression* input; // json
 	std::vector<Statement*> body;
 public:
 	virtual void execute() {
@@ -231,7 +232,7 @@ public:
 public:
 	virtual void execute() {
 		auto* x = data->execute();
-		
+
 		// primitive?
 		if (x->id == 1) {
 			std::cout << (dynamic_cast<Primitive*>(x)->data) << "\n";
@@ -266,13 +267,18 @@ public:
 		Func, // Function, 
 		Ref,
 		Option, // %int ~~
-		
+
 		Return,
-		
+
 		While, Break, Continue,
 		If, Else,
+		
 		Print, PrintLine,
 		Write,
+		Goto,
+		Enter,
+		Quit,
+		Next,
 
 		Modular, // mod
 
@@ -287,20 +293,28 @@ public:
 
 		LogicalAnd, LogicalOr,
 
-		Colon = ':', 
+		Colon = ':',
 		LeftParen = '(', RightParen = ')',
 		LeftBrace = '{', RightBrace = '}',
 		LeftBraket = '[', RightBraket = ']',
 	};
-
+	enum class SubType {
+		None, Int, UInt, Float, String, Any, Bool, Null
+	};
 	class ScanData {
 	public:
 		ScanType type = ScanType::NONE;
+		SubType subtype = SubType::None;
+
 		uint64_t line = 0;
+
 		claujson::_Value json_data;
+		
+		std::vector<claujson::_Value> json_data_vec; // chk?   x.name 
+
 		std::vector<Pattern> pattern_data;
 	};
-	
+
 public:
 	Scanner(char* str, uint64_t sz) : buf(str), sz(sz), tokenizer(str, sz) {
 		tokenizer.init();
@@ -368,7 +382,7 @@ public:
 			case '+':
 			case '-':
 			case '*':
-			case '/': 
+			case '/':
 			case ':':
 			case '(':
 			case ')':
@@ -388,6 +402,7 @@ public:
 		else {
 			bool pass = false;
 			switch (buf[x.start]) {
+				// builtin_function start from .(dot)
 			case '.':
 				if (buf[x.start + 1] == 'p' && strncmp(buf + x.start, ".pattern", 8) == 0) {
 					token.type = ScanType::Pattern; pass = true;
@@ -404,22 +419,25 @@ public:
 				else if (buf[x.start + 1] == 'w' && strncmp(buf + x.start, ".write", 6) == 0) {
 					token.type = ScanType::Write; pass = true;
 				}
+				// modular...
 				else if (buf[x.start + 1] == 'm' && strncmp(buf + x.start, ".mod", 4) == 0) {
 					token.type = ScanType::Modular; pass = true;
 				}
-
-				// .pattern
-				// .func
-				// .$(builtin_function_name)
-					// .print
-					// .println
-					// .write
-					// .mod?
-					/// todo -
-					// .goto
-					// .enter
-					// .quit
-					// .next					
+				else if (buf[x.start + 1] == 'g' && strncmp(buf + x.start, ".goto", 5) == 0) {
+					token.type = ScanType::Goto; pass = true;
+				}
+				else if (buf[x.start + 1] == 'e' && strncmp(buf + x.start, ".enter", 6) == 0) {
+					token.type = ScanType::Enter; pass = true;
+				}
+				else if (buf[x.start + 1] == 'q' && strncmp(buf + x.start, ".quit", 5) == 0) {
+					token.type = ScanType::Quit; pass = true;
+				}
+				else if (buf[x.start + 1] == 'n' && strncmp(buf + x.start, ".next", 5) == 0) {
+					token.type = ScanType::Next; pass = true;
+				}
+				
+				/// todo - Array, Set, Object(, Map?)
+				// 
 				break;
 			case '\"':
 				// check quoted string! and utf8 valid
@@ -448,35 +466,100 @@ public:
 			}
 			break;
 
-			// check true v
-			// check false v
-			// check null v
-			// check ref
-			// check return
-			// check if, else
-			// check while break continue
-			
-			// check Option <- %int %float %uint %string %bool? %true %false %null 
-			//				<- %any 
 			case 't':
-				if (4 == x.length && strncmp(buf + x.start, "true", 4) ==0) {
+				if (4 == x.length && strncmp(buf + x.start, "true", 4) == 0) {
 					token.type = ScanType::JSON_VALUE;
 					token.json_data = claujson::_Value(true);
-					pass = true;	
+					pass = true;
 				}
 				break;
 			case 'f':
-				if (5 == x.length && strncmp(buf + x.start, "false", 5) ==0) {
+				if (5 == x.length && strncmp(buf + x.start, "false", 5) == 0) {
 					token.type = ScanType::JSON_VALUE;
 					token.json_data = claujson::_Value(false);
-					pass = true;	
+					pass = true;
 				}
 				break;
 			case 'n':
-				if (4 == x.length && strncmp(buf + x.start, "null", 4) ==0) {
+				if (4 == x.length && strncmp(buf + x.start, "null", 4) == 0) {
 					token.type = ScanType::JSON_VALUE;
 					token.json_data = claujson::_Value(nullptr);
-					pass = true;	
+					pass = true;
+				}
+				break;
+			case 'r': // ref, return
+				if (3 == x.length && strncmp(buf + x.start, "ref", 3) == 0) {
+					token.type = ScanType::Ref;
+					pass = true;
+				}
+				else if (6 == x.length && strncmp(buf + x.start, "return", 6) == 0) {
+					token.type = ScanType::Return;
+					pass = true;
+				}
+				break;
+			case 'i':
+				if (2 == x.length && strncmp(buf + x.start, "if", 2) == 0) {
+					token.type = ScanType::If;
+					pass = true;
+				}
+				break;
+			case 'e':
+				if (4 == x.length && strncmp(buf + x.start, "else", 4) == 0) {
+					token.type = ScanType::Else;
+					pass = true;
+				}
+				break;
+			case 'w':
+				if (5 == x.length && strncmp(buf + x.start, "while", 5) == 0) {
+					token.type = ScanType::While;
+					pass = true;
+				}
+				break;
+			// option..
+
+			// check Option <- %int %float %uint %string %bool? %true %false %null 
+			//				<- %any 
+			case '%':
+				if (4 == x.length && strncmp(buf + x.start, "%int", 4) == 0) {
+					token.type = ScanType::Option;
+					token.subtype = SubType::Int;
+					pass = true;
+				}
+				break;
+				if (5 == x.length && strncmp(buf + x.start, "%uint", 5) == 0) {
+					token.type = ScanType::Option;
+					token.subtype = SubType::UInt;
+					pass = true;
+				}
+				break;
+				if (6 == x.length && strncmp(buf + x.start, "%float", 6) == 0) {
+					token.type = ScanType::Option;
+					token.subtype = SubType::Float;
+					pass = true;
+				}
+				break;
+				if (5 == x.length && strncmp(buf + x.start, "%bool", 5) == 0) {
+					token.type = ScanType::Option;
+					token.subtype = SubType::Bool;
+					pass = true;
+				}
+				break;
+				if (7 == x.length && strncmp(buf + x.start, "%string", 7) == 0) {
+					token.type = ScanType::Option;
+					token.subtype = SubType::String;
+					pass = true;
+				}
+				break;
+				if (5 == x.length && strncmp(buf + x.start, "%null", 5) == 0) {
+					token.type = ScanType::Option;
+					token.subtype = SubType::Null;
+					pass = true;
+				}
+				break;
+				if (3 == x.length && strncmp(buf + x.start, "%any", 3) == 0) {
+					token.type = ScanType::Option;
+					token.subtype = SubType::Any;
+					pass = true;
 				}
 				break;
 			}
@@ -485,6 +568,28 @@ public:
 				token.type = ScanType::Identifier;
 				token.json_data = claujson::_Value(std::string_view(buf + x.start, x.length));
 			}
+		}
+
+		// find dot, split two string? 
+		if (token.type == ScanType::Identifier) {
+			auto& x = token.json_data.get_string();
+			uint64_t offset = 0;
+			uint64_t start = 0;
+			while ((offset = x.find('.', start)) != claujson::String::npos) { // find dot(.)
+				claujson::_Value after("123");
+				after.get_string() = x.substr(start, offset - start);
+				token.json_data_vec.push_back(std::move(after));
+				start = offset + 1;
+			}
+			// after find, meet end of string?
+			if (start < x.size()) {
+				token.json_data_vec.push_back(claujson::_Value(x.substr(start, x.size() - start)));
+			}
+		}
+		// find dots, split several _Value? %root.0."countries"
+		if (token.type == ScanType::Option) {
+			// %int%float 
+			// %root .0 ."counties"
 		}
 
 		return token;
@@ -553,7 +658,7 @@ int main(int argc, char* argv[])
 
 	claujson::Document d;
 	claujson::parser p(22);
-	
+
 
 	if (p.parse("citylots.json", d, 0).first == false) {
 		std::cout << "err";
