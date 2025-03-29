@@ -1,4 +1,5 @@
 # 2025-01-26
+
 .pattern {
 	"name" : %string
 	"power" : { 
@@ -25,9 +26,10 @@
 	.println(p2)
 
 	.goto(%root.0."countries")
-    
+    #      %now.0."countires"
+    # %now.back
     #.iterate(Pat, f) # iterate with function?
-	while NOT .IsEndOfContainer(%now) {
+	while not .is_end_of_container(%now) {
 		.enter()
         
 		Pat ref x = %now # Pat& x = %now
@@ -64,13 +66,16 @@
     }
 }
 
-# 
-# comma - scanning... tokentype?
+
+## ToDo - yyjson? ##
+
+# %to_remove?
+# %to_insert?
 
 # int state = strict_mode? - type check? debug_mode?
 # x.name -> x and name ?  union?
 
-# %root, %now, checking dot? std::vector<claujson::_Value> ?
+## %root, %now -  checking dot? std::vector<claujson::_Value> ?
 
 # NOT,
 
@@ -81,7 +86,7 @@
 # global variable?
 # array, object variable?
 
-.pattern %array%mutable arr
+.pattern %array arr
 .func {
     .init_set(arr)
     .push_set(arr, 0)
@@ -96,7 +101,9 @@
     .size_array(arr)
     .push_front_array(arr, 0)
 } h
-.pattern %object%mutable obj  # global variable...
+.pattern %object Obj
+Obj obj = { }  # global empty object..
+
 .func {
     .init_map(obj)
     .push_map(obj, "key", 123)
